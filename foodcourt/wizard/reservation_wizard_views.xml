@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_reservation_wizard_form" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.wizard.form</field>
+        <field name="model">foodcourt.reservation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Quick Reservation">
+                <group>
+                    <group string="Customer Information">
+                        <field name="customer_id"/>
+                        <field name="customer_name"/>
+                        <field name="customer_phone"/>
+                        <field name="customer_email"/>
+                    </group>
+                    <group string="Reservation Details">
+                        <field name="reservation_date"/>
+                        <field name="time_start" widget="float_time"/>
+                        <field name="time_end" widget="float_time"/>
+                        <field name="guest_count"/>
+                        <field name="floor_id"/>
+                    </group>
+                </group>
+                <group string="Select Tables">
+                    <field name="available_table_ids" widget="many2many_tags" readonly="1"
+                        string="Available Tables"/>
+                    <field name="table_ids" widget="many2many_tags"
+                        domain="[('id', 'in', available_table_ids)]"/>
+                </group>
+                <group>
+                    <field name="notes" placeholder="Special requests..."/>
+                </group>
+                <footer>
+                    <button name="action_create_reservation" string="Create Reservation"
+                        type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_reservation_wizard" model="ir.actions.act_window">
+        <field name="name">Quick Reservation</field>
+        <field name="res_model">foodcourt.reservation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

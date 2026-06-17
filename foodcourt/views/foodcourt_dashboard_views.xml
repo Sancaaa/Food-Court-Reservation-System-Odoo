@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Order Analysis Graph View -->
+    <record id="view_foodcourt_order_graph" model="ir.ui.view">
+        <field name="name">foodcourt.order.graph</field>
+        <field name="model">foodcourt.order</field>
+        <field name="arch" type="xml">
+            <graph string="Order Analysis" type="bar">
+                <field name="order_date" interval="month"/>
+                <field name="total_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Order Analysis Pivot View -->
+    <record id="view_foodcourt_order_pivot" model="ir.ui.view">
+        <field name="name">foodcourt.order.pivot</field>
+        <field name="model">foodcourt.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Order Analysis">
+                <field name="order_date" interval="month" type="row"/>
+                <field name="state" type="col"/>
+                <field name="total_amount" type="measure"/>
+                <field name="subtotal" type="measure"/>
+                <field name="tax_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Reservation Analysis Graph View -->
+    <record id="view_foodcourt_reservation_graph" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.graph</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <graph string="Reservation Analysis" type="bar">
+                <field name="reservation_date" interval="month"/>
+                <field name="guest_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Reservation Analysis Pivot View -->
+    <record id="view_foodcourt_reservation_pivot" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.pivot</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <pivot string="Reservation Analysis">
+                <field name="reservation_date" interval="month" type="row"/>
+                <field name="state" type="col"/>
+                <field name="guest_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Order Analysis Action -->
+    <record id="action_foodcourt_order_analysis" model="ir.actions.act_window">
+        <field name="name">Order Analysis</field>
+        <field name="res_model">foodcourt.order</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_group_order_date': 1}</field>
+    </record>
+
+    <!-- Reservation Analysis Action -->
+    <record id="action_foodcourt_reservation_analysis" model="ir.actions.act_window">
+        <field name="name">Reservation Analysis</field>
+        <field name="res_model">foodcourt.reservation</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="context">{'search_default_group_reservation_date': 1}</field>
+    </record>
+</odoo>

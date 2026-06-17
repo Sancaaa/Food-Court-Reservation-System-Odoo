@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!--                   RESERVATION VIEWS                          -->
+    <!-- ============================================================ -->
+
+    <!-- Reservation: Form View -->
+    <record id="view_foodcourt_reservation_form" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.form</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Reservation">
+                <header>
+                    <button name="action_confirm" string="Confirm"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_check_in" string="Check In"
+                            type="object" class="btn-primary"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_complete" string="Complete"
+                            type="object" class="btn-primary"
+                            invisible="state != 'checked_in'"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            invisible="state not in ('draft', 'confirmed')"
+                            confirm="Are you sure you want to cancel this reservation?"/>
+                    <button name="action_no_show" string="No Show"
+                            type="object"
+                            invisible="state != 'confirmed'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,checked_in,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_orders" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="order_count == 0">
+                            <field name="order_count" widget="statinfo"
+                                   string="Orders"/>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-users" disabled="1">
+                            <field name="total_table_capacity" widget="statinfo"
+                                   string="Capacity"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Customer Information">
+                            <field name="customer_name"/>
+                            <field name="customer_phone"/>
+                            <field name="customer_email"/>
+                            <field name="customer_id"/>
+                        </group>
+                        <group string="Reservation Details">
+                            <field name="reservation_date"/>
+                            <field name="time_start" widget="float_time"/>
+                            <field name="time_end" widget="float_time"/>
+                            <field name="guest_count"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Reserved Tables">
+                        <field name="table_ids" widget="many2many_tags" nolabel="1"
+                               colspan="2"/>
+                    </group>
+                    <notebook>
+                        <page string="Orders" name="orders">
+                            <field name="order_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="order_date"/>
+                                    <field name="total_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-info="state in ('confirmed', 'preparing', 'ready')"
+                                           decoration-warning="state == 'served'"
+                                           decoration-danger="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                            <div invisible="state != 'checked_in'">
+                                <button name="action_create_order" string="Create Order"
+                                        type="object" class="btn-primary"
+                                        icon="fa-plus"/>
+                            </div>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                   placeholder="Any special requests or notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Reservation: List View -->
+    <record id="view_foodcourt_reservation_list" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.list</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <list string="Reservations"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-success="state == 'checked_in'"
+                  decoration-info="state == 'confirmed'"
+                  decoration-bf="state == 'draft'">
+                <field name="name"/>
+                <field name="customer_name"/>
+                <field name="reservation_date"/>
+                <field name="time_start" widget="float_time"/>
+                <field name="time_end" widget="float_time"/>
+                <field name="guest_count"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('checked_in', 'completed')"
+                       decoration-info="state == 'confirmed'"
+                       decoration-danger="state in ('cancelled', 'no_show')"
+                       decoration-warning="state == 'draft'"/>
+                <field name="order_count" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Reservation: Calendar View -->
+    <record id="view_foodcourt_reservation_calendar" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.calendar</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <calendar string="Reservations" date_start="date_start"
+                      date_stop="date_stop" color="state" mode="week"
+                      event_open_popup="true" quick_create="false">
+                <field name="name"/>
+                <field name="customer_name"/>
+                <field name="guest_count"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Reservation: Kanban View -->
+    <record id="view_foodcourt_reservation_kanban" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.kanban</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong>
+                                <field name="name"/>
+                            </strong>
+                            <field name="state" widget="label_selection"
+                                   options="{'classes': {
+                                       'draft': 'default',
+                                       'confirmed': 'info',
+                                       'checked_in': 'success',
+                                       'completed': 'success',
+                                       'cancelled': 'danger',
+                                       'no_show': 'warning'
+                                   }}"/>
+                        </div>
+                        <div>
+                            <i class="fa fa-user me-1"/><field name="customer_name"/>
+                        </div>
+                        <div>
+                            <i class="fa fa-calendar me-1"/><field name="reservation_date"/>
+                        </div>
+                        <div>
+                            <i class="fa fa-clock-o me-1"/>
+                            <field name="time_start" widget="float_time"/> -
+                            <field name="time_end" widget="float_time"/>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <span>
+                                <i class="fa fa-users me-1"/>
+                                <field name="guest_count"/> guests
+                            </span>
+                            <span>
+                                <field name="table_ids" widget="many2many_tags"/>
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Reservation: Search View -->
+    <record id="view_foodcourt_reservation_search" model="ir.ui.view">
+        <field name="name">foodcourt.reservation.search</field>
+        <field name="model">foodcourt.reservation</field>
+        <field name="arch" type="xml">
+            <search string="Search Reservations">
+                <field name="customer_name"/>
+                <field name="name"/>
+                <field name="customer_phone"/>
+                <separator/>
+                <filter string="Confirmed" name="confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Today" name="today"
+                        domain="[('reservation_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Upcoming" name="upcoming"
+                        domain="[('reservation_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('state', 'in', ('draft', 'confirmed'))]"/>
+                <filter string="Checked In" name="checked_in"
+                        domain="[('state', '=', 'checked_in')]"/>
+                <separator/>
+                <filter string="Archived" name="inactive"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Reservation Date" name="group_date"
+                            context="{'group_by': 'reservation_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Reservation: Window Action -->
+    <record id="action_foodcourt_reservation" model="ir.actions.act_window">
+        <field name="name">Reservations</field>
+        <field name="res_model">foodcourt.reservation</field>
+        <field name="view_mode">list,form,kanban,calendar</field>
+        <field name="search_view_id" ref="view_foodcourt_reservation_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first reservation
+            </p>
+            <p>
+                Manage table reservations for your food court customers.
+            </p>
+        </field>
+    </record>
+
+</odoo>

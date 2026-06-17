@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!--                      TENANT VIEWS                            -->
+    <!-- ============================================================ -->
+
+    <!-- Form View -->
+    <record id="view_foodcourt_tenant_form" model="ir.ui.view">
+        <field name="name">foodcourt.tenant.form</field>
+        <field name="model">foodcourt.tenant</field>
+        <field name="arch" type="xml">
+            <form string="Tenant">
+                <header>
+                    <button name="action_activate" string="Activate"
+                            type="object" class="oe_highlight"
+                            invisible="state not in ('draft', 'suspended')"/>
+                    <button name="action_suspend" string="Suspend"
+                            type="object"
+                            invisible="state != 'active'"
+                            confirm="Are you sure you want to suspend this tenant?"/>
+                    <button name="action_terminate" string="Terminate"
+                            type="object" class="btn-danger"
+                            invisible="state not in ('active', 'suspended')"
+                            confirm="Are you sure you want to terminate this tenant?"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state not in ('suspended', 'terminated')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,suspended,terminated"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_menu_items"
+                                icon="fa-cutlery">
+                            <field name="menu_count" widget="statinfo"
+                                   string="Menu Items"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_orders"
+                                icon="fa-shopping-cart">
+                            <field name="order_count" widget="statinfo"
+                                   string="Orders"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_revenue"
+                                icon="fa-money">
+                            <field name="total_revenue" widget="statinfo"
+                                   string="Revenue"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="image" widget="image"
+                           class="oe_avatar"
+                           options="{'preview_image': 'image'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"
+                                   placeholder="e.g. Warung Nasi Goreng"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="partner_id"/>
+                            <field name="cuisine_type"/>
+                            <field name="stall_id"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                        <group>
+                            <field name="contract_start"/>
+                            <field name="contract_end"/>
+                            <field name="revenue_share_pct"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Menu Items" name="menu_items">
+                            <field name="menu_item_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="price" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="is_available"/>
+                                    <field name="is_halal"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description"
+                                   placeholder="Describe this tenant or vendor..."/>
+                        </page>
+                        <page string="Contract Info" name="contract_info">
+                            <group>
+                                <group string="Contract Details">
+                                    <field name="contract_start"/>
+                                    <field name="contract_end"/>
+                                    <field name="revenue_share_pct"/>
+                                </group>
+                                <group string="Assignment">
+                                    <field name="stall_id"/>
+                                    <field name="partner_id"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_foodcourt_tenant_list" model="ir.ui.view">
+        <field name="name">foodcourt.tenant.list</field>
+        <field name="model">foodcourt.tenant</field>
+        <field name="arch" type="xml">
+            <list string="Tenants"
+                  decoration-muted="state == 'terminated'"
+                  decoration-warning="state == 'suspended'">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="cuisine_type"/>
+                <field name="stall_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'suspended'"
+                       decoration-danger="state == 'terminated'"/>
+                <field name="phone"/>
+                <field name="revenue_share_pct" string="Rev. Share (%)"/>
+                <field name="total_revenue" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_foodcourt_tenant_kanban" model="ir.ui.view">
+        <field name="name">foodcourt.tenant.kanban</field>
+        <field name="model">foodcourt.tenant</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <field name="image" widget="image"
+                                       options="{'preview_image': 'image', 'size': [48, 48]}"/>
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <strong class="text-truncate">
+                                        <field name="name"/>
+                                    </strong>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'draft'"
+                                           decoration-success="state == 'active'"
+                                           decoration-warning="state == 'suspended'"
+                                           decoration-danger="state == 'terminated'"/>
+                                </div>
+                                <div t-if="record.cuisine_type.value"
+                                     class="text-muted small">
+                                    <i class="fa fa-cutlery me-1"/>
+                                    <field name="cuisine_type"/>
+                                </div>
+                                <div t-if="record.stall_id.value"
+                                     class="text-muted small">
+                                    <i class="fa fa-map-marker me-1"/>
+                                    <field name="stall_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_foodcourt_tenant_search" model="ir.ui.view">
+        <field name="name">foodcourt.tenant.search</field>
+        <field name="model">foodcourt.tenant</field>
+        <field name="arch" type="xml">
+            <search string="Search Tenants">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="cuisine_type"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_active_state" string="Active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter name="filter_suspended" string="Suspended"
+                        domain="[('state', '=', 'suspended')]"/>
+                <filter name="filter_terminated" string="Terminated"
+                        domain="[('state', '=', 'terminated')]"/>
+                <separator/>
+                <filter name="filter_active" string="Active Records"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_cuisine" string="Cuisine Type"
+                            context="{'group_by': 'cuisine_type'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_stall" string="Stall"
+                            context="{'group_by': 'stall_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_foodcourt_tenant" model="ir.actions.act_window">
+        <field name="name">Tenants</field>
+        <field name="res_model">foodcourt.tenant</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_foodcourt_tenant_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register your first tenant
+            </p>
+            <p>
+                Add food vendors and manage their contracts, menus,
+                and revenue sharing.
+            </p>
+        </field>
+    </record>
+
+</odoo>

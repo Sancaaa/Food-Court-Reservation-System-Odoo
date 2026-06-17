@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_sales" model="ir.actions.report">
+        <field name="name">Sales Report</field>
+        <field name="model">foodcourt.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">foodcourt.report_sales_document</field>
+        <field name="report_file">foodcourt.report_sales_document</field>
+        <field name="binding_model_id" ref="model_foodcourt_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_sales_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Sales Receipt</h2>
+                        <h3 class="text-center text-muted"><span t-field="o.name"/></h3>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr><td class="fw-bold">Customer</td><td><span t-field="o.customer_name"/></td></tr>
+                                    <tr><td class="fw-bold">Order Type</td><td><span t-field="o.order_type"/></td></tr>
+                                    <tr t-if="o.table_id"><td class="fw-bold">Table</td><td><span t-field="o.table_id"/></td></tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr><td class="fw-bold">Date</td><td><span t-field="o.order_date"/></td></tr>
+                                    <tr><td class="fw-bold">Status</td><td><span t-field="o.state"/></td></tr>
+                                    <tr><td class="fw-bold">Payment</td><td><span t-field="o.payment_state"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Order Items</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Tenant</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.menu_item_id"/></td>
+                                        <td><span t-field="line.tenant_id"/></td>
+                                        <td class="text-end"><span t-field="line.quantity"/></td>
+                                        <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        <td class="text-end"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Subtotal</td>
+                                    <td class="text-end"><span t-field="o.subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end">Tax (<span t-field="o.tax_pct"/>%)</td>
+                                    <td class="text-end"><span t-field="o.tax_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td colspan="4" class="text-end">Total</td>
+                                    <td class="text-end"><span t-field="o.total_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end">Amount Paid</td>
+                                    <td class="text-end"><span t-field="o.amount_paid" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td colspan="4" class="text-end">Amount Due</td>
+                                    <td class="text-end"><span t-field="o.amount_due" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <t t-if="o.notes">
+                            <h4>Notes</h4>
+                            <p><span t-field="o.notes"/></p>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

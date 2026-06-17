@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!--                    FLOOR / AREA VIEWS                        -->
+    <!-- ============================================================ -->
+
+    <!-- Form View -->
+    <record id="view_foodcourt_floor_form" model="ir.ui.view">
+        <field name="name">foodcourt.floor.form</field>
+        <field name="model">foodcourt.floor</field>
+        <field name="arch" type="xml">
+            <form string="Floor/Area">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_stalls"
+                                icon="fa-store">
+                            <field name="stall_count" widget="statinfo"
+                                   string="Stalls"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_tables"
+                                icon="fa-th-large">
+                            <field name="table_count" widget="statinfo"
+                                   string="Tables"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Ground Floor"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="total_capacity"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Stalls" name="stalls">
+                            <field name="stall_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="state"/>
+                                    <field name="tenant_id"/>
+                                    <field name="monthly_rent"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Tables" name="tables">
+                            <field name="table_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="capacity"/>
+                                    <field name="state"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description"
+                                   placeholder="Describe this floor or area..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_foodcourt_floor_list" model="ir.ui.view">
+        <field name="name">foodcourt.floor.list</field>
+        <field name="model">foodcourt.floor</field>
+        <field name="arch" type="xml">
+            <list string="Floors/Areas">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code" optional="show"/>
+                <field name="stall_count"/>
+                <field name="table_count"/>
+                <field name="total_capacity"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_foodcourt_floor_search" model="ir.ui.view">
+        <field name="name">foodcourt.floor.search</field>
+        <field name="model">foodcourt.floor</field>
+        <field name="arch" type="xml">
+            <search string="Search Floors">
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_company" string="Company"
+                            context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_foodcourt_floor" model="ir.actions.act_window">
+        <field name="name">Floors / Areas</field>
+        <field name="res_model">foodcourt.floor</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_foodcourt_floor_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first floor or area
+            </p>
+            <p>
+                Organise your food court into floors or areas to manage
+                stalls and tables efficiently.
+            </p>
+        </field>
+    </record>
+
+</odoo>

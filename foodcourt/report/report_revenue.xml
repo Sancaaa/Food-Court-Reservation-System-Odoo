@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_revenue" model="ir.actions.report">
+        <field name="name">Revenue Sharing Report</field>
+        <field name="model">foodcourt.tenant</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">foodcourt.report_revenue_document</field>
+        <field name="report_file">foodcourt.report_revenue_document</field>
+        <field name="binding_model_id" ref="model_foodcourt_tenant"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_revenue_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Revenue Sharing Report</h2>
+                        <h3 class="text-center text-muted"><span t-field="o.name"/> (<span t-field="o.code"/>)</h3>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr><td class="fw-bold">Tenant</td><td><span t-field="o.name"/></td></tr>
+                                    <tr><td class="fw-bold">Cuisine</td><td><span t-field="o.cuisine_type"/></td></tr>
+                                    <tr><td class="fw-bold">Stall</td><td><span t-field="o.stall_id"/></td></tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr><td class="fw-bold">Revenue Share %</td><td><span t-field="o.revenue_share_pct"/>%</td></tr>
+                                    <tr><td class="fw-bold">Contract Start</td><td><span t-field="o.contract_start"/></td></tr>
+                                    <tr><td class="fw-bold">Contract End</td><td><span t-field="o.contract_end"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Revenue Summary</h4>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold">Total Sales Revenue</td>
+                                    <td class="text-end"><span t-field="o.total_revenue"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Food Court Share (<span t-field="o.revenue_share_pct"/>%)</td>
+                                    <td class="text-end">
+                                        <span t-esc="'%.2f' % (o.total_revenue * o.revenue_share_pct / 100)"/>
+                                    </td>
+                                </tr>
+                                <tr class="fw-bold table-success">
+                                    <td>Tenant Net Revenue</td>
+                                    <td class="text-end">
+                                        <span t-esc="'%.2f' % (o.total_revenue * (100 - o.revenue_share_pct) / 100)"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt-4">Menu Items Performance</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Menu Item</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-center">Available</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.menu_item_ids" t-as="item">
+                                    <tr>
+                                        <td><span t-field="item.name"/></td>
+                                        <td class="text-end"><span t-field="item.price"/></td>
+                                        <td class="text-center">
+                                            <t t-if="item.is_available">✓</t>
+                                            <t t-else="">✗</t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!--                      STALL VIEWS                             -->
+    <!-- ============================================================ -->
+
+    <!-- Form View -->
+    <record id="view_foodcourt_stall_form" model="ir.ui.view">
+        <field name="name">foodcourt.stall.form</field>
+        <field name="model">foodcourt.stall</field>
+        <field name="arch" type="xml">
+            <form string="Stall">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="available,occupied,maintenance"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"
+                                   placeholder="e.g. Stall A-01"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="floor_id"/>
+                            <field name="tenant_id"/>
+                        </group>
+                        <group>
+                            <field name="state"/>
+                            <field name="monthly_rent"
+                                   widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="size"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Facilities" name="facilities">
+                            <field name="facilities"
+                                   placeholder="List available facilities (water, electricity, gas, etc.)"/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                   placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_foodcourt_stall_list" model="ir.ui.view">
+        <field name="name">foodcourt.stall.list</field>
+        <field name="model">foodcourt.stall</field>
+        <field name="arch" type="xml">
+            <list string="Stalls"
+                  decoration-success="state == 'available'"
+                  decoration-warning="state == 'occupied'"
+                  decoration-danger="state == 'maintenance'">
+                <field name="name"/>
+                <field name="code" optional="show"/>
+                <field name="floor_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-warning="state == 'occupied'"
+                       decoration-danger="state == 'maintenance'"/>
+                <field name="tenant_id"/>
+                <field name="monthly_rent" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_foodcourt_stall_kanban" model="ir.ui.view">
+        <field name="name">foodcourt.stall.kanban</field>
+        <field name="model">foodcourt.stall</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between mb-1">
+                            <strong>
+                                <field name="name"/>
+                            </strong>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'available'"
+                                   decoration-warning="state == 'occupied'"
+                                   decoration-danger="state == 'maintenance'"/>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fa fa-building me-1"/>
+                            <field name="floor_id"/>
+                        </div>
+                        <div t-if="record.tenant_id.value" class="text-muted small">
+                            <i class="fa fa-user me-1"/>
+                            <field name="tenant_id"/>
+                        </div>
+                        <div class="mt-1">
+                            <strong>
+                                <field name="monthly_rent" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                            </strong>
+                            <field name="currency_id" invisible="1"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_foodcourt_stall_search" model="ir.ui.view">
+        <field name="name">foodcourt.stall.search</field>
+        <field name="model">foodcourt.stall</field>
+        <field name="arch" type="xml">
+            <search string="Search Stalls">
+                <field name="name"/>
+                <field name="floor_id"/>
+                <field name="tenant_id"/>
+                <separator/>
+                <filter name="filter_available" string="Available"
+                        domain="[('state', '=', 'available')]"/>
+                <filter name="filter_occupied" string="Occupied"
+                        domain="[('state', '=', 'occupied')]"/>
+                <filter name="filter_maintenance" string="Under Maintenance"
+                        domain="[('state', '=', 'maintenance')]"/>
+                <separator/>
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_floor" string="Floor/Area"
+                            context="{'group_by': 'floor_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_tenant" string="Tenant"
+                            context="{'group_by': 'tenant_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_foodcourt_stall" model="ir.actions.act_window">
+        <field name="name">Stalls</field>
+        <field name="res_model">foodcourt.stall</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_foodcourt_stall_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first stall
+            </p>
+            <p>
+                Set up stalls and assign them to floors and tenants.
+            </p>
+        </field>
+    </record>
+
+</odoo>
