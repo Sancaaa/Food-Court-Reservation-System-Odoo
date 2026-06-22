@@ -49,6 +49,12 @@ class FoodcourtMenuCategory(models.Model):
         inverse_name='parent_id',
         string='Child Categories',
     )
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company,
+    )
     image = fields.Image(
         string='Category Image',
         max_width=128,
