@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -42,8 +42,6 @@
                         </group>
                         <group>
                             <field name="state"/>
-                            <field name="company_id"
-                                   groups="base.group_multi_company"/>
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
@@ -71,9 +69,7 @@
                        decoration-warning="state == 'reserved'"
                        decoration-danger="state == 'occupied'"
                        decoration-info="state == 'cleaning'"/>
-                <field name="company_id" optional="hide"
-                       groups="base.group_multi_company"/>
-            </list>
+                </list>
         </field>
     </record>
 
@@ -160,3 +156,4 @@
     </record>
 
 </odoo>
+

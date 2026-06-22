@@ -1,4 +1,4 @@
-"""Food Court Table Management."""
+﻿"""Food Court Table Management."""
 
 from odoo import api, fields, models
 
@@ -14,7 +14,6 @@ class FoodcourtTable(models.Model):
     _description = 'Food Court Table'
     _inherit = ['mail.thread']
     _order = 'floor_id, name'
-    _check_company_auto = True
 
     name = fields.Char(
         string='Table Number',
@@ -28,7 +27,6 @@ class FoodcourtTable(models.Model):
         required=True,
         ondelete='restrict',
         tracking=True,
-        check_company=True,
     )
     capacity = fields.Integer(
         string='Seating Capacity',
@@ -55,16 +53,10 @@ class FoodcourtTable(models.Model):
     notes = fields.Text(
         string='Notes',
     )
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
 
-    _name_company_uniq = models.Constraint(
-        'UNIQUE(name, company_id)',
-        'The table name must be unique per company.',
+    _name_uniq = models.Constraint(
+        'UNIQUE(name)',
+        'The table name must be unique.',
     )
 
     # ------------------------------------------------------------------

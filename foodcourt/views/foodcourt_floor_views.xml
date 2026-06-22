@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -42,8 +42,6 @@
                         </group>
                         <group>
                             <field name="total_capacity"/>
-                            <field name="company_id"
-                                   groups="base.group_multi_company"/>
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
@@ -56,8 +54,7 @@
                                     <field name="state"/>
                                     <field name="tenant_id"/>
                                     <field name="monthly_rent"/>
-                                    <field name="company_id" column_invisible="1"/>
-                                </list>
+                                    </list>
                             </field>
                         </page>
                         <page string="Tables" name="tables">
@@ -66,8 +63,7 @@
                                     <field name="name"/>
                                     <field name="capacity"/>
                                     <field name="state"/>
-                                    <field name="company_id" column_invisible="1"/>
-                                </list>
+                                    </list>
                             </field>
                         </page>
                         <page string="Description" name="description">
@@ -93,9 +89,7 @@
                 <field name="stall_count"/>
                 <field name="table_count"/>
                 <field name="total_capacity"/>
-                <field name="company_id" optional="hide"
-                       groups="base.group_multi_company"/>
-            </list>
+                </list>
         </field>
     </record>
 
@@ -113,9 +107,7 @@
                         domain="[('active', '=', False)]"/>
                 <separator/>
                 <group expand="0" string="Group By">
-                    <filter name="group_company" string="Company"
-                            context="{'group_by': 'company_id'}"/>
-                </group>
+                    </group>
             </search>
         </field>
     </record>
@@ -138,3 +130,4 @@
     </record>
 
 </odoo>
+

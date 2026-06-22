@@ -1,4 +1,4 @@
-"""Food Court Order Management."""
+﻿"""Food Court Order Management."""
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -17,7 +17,6 @@ class FoodcourtOrder(models.Model):
     _name = 'foodcourt.order'
     _description = 'Order'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _check_company_auto = True
     _order = 'order_date desc'
 
     # ------------------------------------------------------------------
@@ -156,16 +155,9 @@ class FoodcourtOrder(models.Model):
     )
 
     # -- Multi-company / currency --
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
         string='Currency',
-        required=True,
         default=lambda self: self.env.company.currency_id,
     )
 
@@ -252,3 +244,4 @@ class FoodcourtOrder(models.Model):
     def action_cancel(self):
         """Cancel the order."""
         self.write({'state': 'cancelled'})
+

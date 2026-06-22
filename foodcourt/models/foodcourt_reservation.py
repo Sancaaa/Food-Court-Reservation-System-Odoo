@@ -1,4 +1,4 @@
-"""Food Court Reservation Management."""
+﻿"""Food Court Reservation Management."""
 
 from datetime import datetime, timedelta
 
@@ -19,7 +19,6 @@ class FoodcourtReservation(models.Model):
     _name = 'foodcourt.reservation'
     _description = 'Reservation'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _check_company_auto = True
     _order = 'reservation_date desc, time_start'
 
     # ------------------------------------------------------------------
@@ -134,12 +133,6 @@ class FoodcourtReservation(models.Model):
         compute='_compute_calendar_dates',
         store=True,
         precompute=True,
-    )
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
     )
 
     _guest_count_positive = models.Constraint(
@@ -318,7 +311,6 @@ class FoodcourtReservation(models.Model):
             'customer_name': self.customer_name,
             'table_id': self.table_ids[:1].id if self.table_ids else False,
             'order_type': 'dine_in',
-            'company_id': self.company_id.id,
         })
         return {
             'type': 'ir.actions.act_window',
@@ -328,3 +320,4 @@ class FoodcourtReservation(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+

@@ -17,7 +17,6 @@ class FoodcourtTenant(models.Model):
     _description = 'Food Court Tenant/Vendor'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
-    _check_company_auto = True
 
     name = fields.Char(
         string='Tenant Name',
@@ -63,7 +62,6 @@ class FoodcourtTenant(models.Model):
         string='Assigned Stall',
         ondelete='set null',
         tracking=True,
-        check_company=True,
     )
     phone = fields.Char(
         string='Phone',
@@ -127,24 +125,15 @@ class FoodcourtTenant(models.Model):
         string='Active',
         default=True,
     )
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
         string='Currency',
-        related='company_id.currency_id',
-        store=True,
-        precompute=True,
-        readonly=True,
+        default=lambda self: self.env.company.currency_id,
     )
 
-    _code_company_uniq = models.Constraint(
-        'UNIQUE(code, company_id)',
-        'The tenant code must be unique per company.',
+    _code_uniq = models.Constraint(
+        'UNIQUE(code)',
+        'The tenant code must be unique.',
     )
 
     # ------------------------------------------------------------------

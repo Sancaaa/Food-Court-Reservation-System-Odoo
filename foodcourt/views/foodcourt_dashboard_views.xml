@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Order Analysis Graph View -->
     <record id="view_foodcourt_order_graph" model="ir.ui.view">
@@ -110,3 +110,4 @@
         <field name="context">{'search_default_group_reservation_date': 1}</field>
     </record>
 </odoo>
+

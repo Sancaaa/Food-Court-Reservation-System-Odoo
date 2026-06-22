@@ -1,4 +1,4 @@
-"""Food Court Payment Processing."""
+﻿"""Food Court Payment Processing."""
 
 from odoo import api, fields, models
 
@@ -15,7 +15,6 @@ class FoodcourtPayment(models.Model):
     _name = 'foodcourt.payment'
     _description = 'Payment'
     _inherit = ['mail.thread']
-    _check_company_auto = True
     _order = 'payment_date desc'
 
     # ------------------------------------------------------------------
@@ -94,16 +93,9 @@ class FoodcourtPayment(models.Model):
     )
 
     # -- Multi-company / currency --
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
         string='Currency',
-        required=True,
         default=lambda self: self.env.company.currency_id,
     )
 
@@ -137,3 +129,4 @@ class FoodcourtPayment(models.Model):
     def action_refund(self):
         """Mark the payment as refunded."""
         self.write({'state': 'refunded'})
+

@@ -1,4 +1,4 @@
-"""Food Court Order Line Management."""
+﻿"""Food Court Order Line Management."""
 
 from odoo import api, fields, models
 
@@ -75,13 +75,6 @@ class FoodcourtOrderLine(models.Model):
     )
 
     # -- Related company / currency --
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        related='order_id.company_id',
-        store=True,
-        precompute=True,
-    )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
         string='Currency',
@@ -118,3 +111,4 @@ class FoodcourtOrderLine(models.Model):
             self.tenant_id = self.menu_item_id.tenant_id
             self.unit_price = self.menu_item_id.price
             self.name = self.menu_item_id.name
+

@@ -14,7 +14,6 @@ class FoodcourtStall(models.Model):
     _description = 'Food Court Stall/Booth'
     _inherit = ['mail.thread']
     _order = 'floor_id, name'
-    _check_company_auto = True
 
     name = fields.Char(
         string='Stall Name',
@@ -31,7 +30,6 @@ class FoodcourtStall(models.Model):
         required=True,
         ondelete='restrict',
         tracking=True,
-        check_company=True,
     )
     state = fields.Selection(
         selection=[
@@ -49,7 +47,6 @@ class FoodcourtStall(models.Model):
         string='Current Tenant',
         ondelete='set null',
         tracking=True,
-        check_company=True,
     )
     monthly_rent = fields.Float(
         string='Monthly Rent',
@@ -71,16 +68,8 @@ class FoodcourtStall(models.Model):
         string='Active',
         default=True,
     )
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
         string='Currency',
-        related='company_id.currency_id',
-        store=True,
-        readonly=True,
+        default=lambda self: self.env.company.currency_id,
     )

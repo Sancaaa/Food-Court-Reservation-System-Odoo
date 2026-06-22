@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -38,9 +38,6 @@
                                    widget="monetary"
                                    options="{'currency_field': 'currency_id'}"/>
                             <field name="size"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="company_id"
-                                   groups="base.group_multi_company"/>
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
@@ -79,10 +76,7 @@
                 <field name="tenant_id"/>
                 <field name="monthly_rent" widget="monetary"
                        options="{'currency_field': 'currency_id'}"/>
-                <field name="currency_id" column_invisible="1"/>
-                <field name="company_id" optional="hide"
-                       groups="base.group_multi_company"/>
-            </list>
+                </list>
         </field>
     </record>
 
@@ -116,8 +110,7 @@
                                 <field name="monthly_rent" widget="monetary"
                                        options="{'currency_field': 'currency_id'}"/>
                             </strong>
-                            <field name="currency_id" invisible="1"/>
-                        </div>
+                            </div>
                     </t>
                 </templates>
             </kanban>
@@ -175,3 +168,4 @@
     </record>
 
 </odoo>
+

@@ -1,4 +1,4 @@
-"""Food Court Menu Category Management."""
+﻿"""Food Court Menu Category Management."""
 
 from odoo import api, fields, models
 
@@ -49,12 +49,6 @@ class FoodcourtMenuCategory(models.Model):
         inverse_name='parent_id',
         string='Child Categories',
     )
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
     image = fields.Image(
         string='Category Image',
         max_width=128,
@@ -89,3 +83,4 @@ class FoodcourtMenuCategory(models.Model):
         """Count the number of menu items belonging to this category."""
         for category in self:
             category.item_count = len(category.menu_item_ids)
+

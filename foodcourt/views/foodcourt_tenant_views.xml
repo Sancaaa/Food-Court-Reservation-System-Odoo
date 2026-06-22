@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -76,9 +76,6 @@
                             <field name="contract_start"/>
                             <field name="contract_end"/>
                             <field name="revenue_share_pct"/>
-                            <field name="company_id"
-                                   groups="base.group_multi_company"/>
-                            <field name="currency_id" invisible="1"/>
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
@@ -91,9 +88,7 @@
                                            options="{'currency_field': 'currency_id'}"/>
                                     <field name="is_available"/>
                                     <field name="is_halal"/>
-                                    <field name="currency_id" column_invisible="1"/>
-                                    <field name="company_id" column_invisible="1"/>
-                                </list>
+                                    </list>
                             </field>
                         </page>
                         <page string="Description" name="description">
@@ -141,10 +136,7 @@
                 <field name="revenue_share_pct" string="Rev. Share (%)"/>
                 <field name="total_revenue" widget="monetary"
                        options="{'currency_field': 'currency_id'}"/>
-                <field name="currency_id" column_invisible="1"/>
-                <field name="company_id" optional="hide"
-                       groups="base.group_multi_company"/>
-            </list>
+                </list>
         </field>
     </record>
 
@@ -244,3 +236,4 @@
     </record>
 
 </odoo>
+

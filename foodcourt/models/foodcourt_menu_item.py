@@ -1,4 +1,4 @@
-"""Food Court Menu Item Management."""
+﻿"""Food Court Menu Item Management."""
 
 from odoo import api, fields, models
 
@@ -14,7 +14,6 @@ class FoodcourtMenuItem(models.Model):
     _name = 'foodcourt.menu.item'
     _description = 'Menu Item'
     _inherit = ['mail.thread']
-    _check_company_auto = True
     _order = 'tenant_id, category_id, name'
 
     # ------------------------------------------------------------------
@@ -91,16 +90,9 @@ class FoodcourtMenuItem(models.Model):
     )
 
     # -- Multi-company / currency --
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True,
-        default=lambda self: self.env.company,
-    )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
         string='Currency',
-        required=True,
         default=lambda self: self.env.company.currency_id,
     )
 
@@ -112,3 +104,4 @@ class FoodcourtMenuItem(models.Model):
         'UNIQUE(name, tenant_id)',
         'The item name must be unique per tenant.',
     )
+
