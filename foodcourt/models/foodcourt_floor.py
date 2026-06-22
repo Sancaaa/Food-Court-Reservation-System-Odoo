@@ -89,3 +89,39 @@ class FoodcourtFloor(models.Model):
         """Sum seating capacity of all tables on this floor."""
         for floor in self:
             floor.total_capacity = sum(floor.table_ids.mapped('capacity'))
+            
+    # ------------------------------------------------------------------
+    # Action methods
+    # ------------------------------------------------------------------
+
+    def action_view_stalls(self):
+        """Open stalls belonging to this floor."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Stalls',
+            'res_model': 'foodcourt.stall',
+            'view_mode': 'list,form',
+            'domain': [('floor_id', '=', self.id)],
+            'context': {
+                'default_floor_id': self.id,
+            },
+        }    
+        
+    # ------------------------------------------------------------------
+    # Action methods
+    # ------------------------------------------------------------------
+
+    def action_view_stalls(self):
+        """Open stalls belonging to this floor."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Stalls',
+            'res_model': 'foodcourt.stall',
+            'view_mode': 'list,form',
+            'domain': [('floor_id', '=', self.id)],
+            'context': {
+                'default_floor_id': self.id,
+            },
+        }
