@@ -125,3 +125,16 @@ class FoodcourtFloor(models.Model):
                 'default_floor_id': self.id,
             },
         }
+
+def action_view_tables(self):
+    self.ensure_one()
+    return {
+        'type': 'ir.actions.act_window',
+        'name': 'Tables',
+        'res_model': 'foodcourt.table',
+        'view_mode': 'list,form',
+        'domain': [('floor_id', '=', self.id)],
+        'context': {
+            'default_floor_id': self.id,
+        },
+    }
