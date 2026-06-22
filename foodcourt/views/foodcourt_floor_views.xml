@@ -105,10 +105,7 @@
                         domain="[('active', '=', True)]"/>
                 <filter name="filter_archived" string="Archived"
                         domain="[('active', '=', False)]"/>
-                <separator/>
-                <group expand="0" string="Group By">
-                    <filter string="Active/Archived" name="group_by_active" context="{'group_by': 'active'}"/>
-                </group>
+
             </search>
         </field>
     </record>
