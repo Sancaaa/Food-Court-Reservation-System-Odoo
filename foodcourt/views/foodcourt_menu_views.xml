@@ -83,10 +83,6 @@
                 <separator/>
                 <filter string="Archived" name="inactive"
                         domain="[('active', '=', False)]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Parent Category" name="group_parent"
-                            context="{'group_by': 'parent_id'}"/>
-                </group>
             </search>
         </field>
     </record>
@@ -249,12 +245,6 @@
                 <separator/>
                 <filter string="Archived" name="inactive"
                         domain="[('active', '=', False)]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Tenant" name="group_tenant"
-                            context="{'group_by': 'tenant_id'}"/>
-                    <filter string="Category" name="group_category"
-                            context="{'group_by': 'category_id'}"/>
-                </group>
             </search>
         </field>
     </record>

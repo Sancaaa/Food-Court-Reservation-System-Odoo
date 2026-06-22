@@ -105,14 +105,6 @@
                         domain="[('payment_method', '=', 'bank_transfer')]"/>
                 <filter string="QRIS" name="qris"
                         domain="[('payment_method', '=', 'qris')]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Payment Method" name="group_method"
-                            context="{'group_by': 'payment_method'}"/>
-                    <filter string="Status" name="group_state"
-                            context="{'group_by': 'state'}"/>
-                    <filter string="Payment Date" name="group_date"
-                            context="{'group_by': 'payment_date:day'}"/>
-                </group>
             </search>
         </field>
     </record>

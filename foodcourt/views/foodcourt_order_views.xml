@@ -227,16 +227,6 @@
                 <filter string="Today" name="today"
                         domain="[('order_date', '&gt;=', (context_today()).strftime('%Y-%m-%d 00:00:00')),
                                  ('order_date', '&lt;=', (context_today()).strftime('%Y-%m-%d 23:59:59'))]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Status" name="group_state"
-                            context="{'group_by': 'state'}"/>
-                    <filter string="Order Type" name="group_order_type"
-                            context="{'group_by': 'order_type'}"/>
-                    <filter string="Payment Status" name="group_payment_state"
-                            context="{'group_by': 'payment_state'}"/>
-                    <filter string="Order Date" name="group_order_date"
-                            context="{'group_by': 'order_date:day'}"/>
-                </group>
             </search>
         </field>
     </record>

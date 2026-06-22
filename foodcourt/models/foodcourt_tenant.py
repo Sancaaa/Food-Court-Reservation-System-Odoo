@@ -244,3 +244,15 @@ class FoodcourtTenant(models.Model):
             'domain': [('tenant_id', '=', self.id)],
             'context': {'default_tenant_id': self.id},
         }
+
+    def action_view_revenue(self):
+        """Open list of done order lines for this tenant."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Revenue Details',
+            'res_model': 'foodcourt.order.line',
+            'view_mode': 'list,form',
+            'domain': [('tenant_id', '=', self.id), ('order_id.state', '=', 'done')],
+            'context': {'default_tenant_id': self.id},
+        }

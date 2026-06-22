@@ -206,14 +206,6 @@
                 <filter name="filter_archived" string="Archived"
                         domain="[('active', '=', False)]"/>
                 <separator/>
-                <group expand="0" string="Group By">
-                    <filter name="group_cuisine" string="Cuisine Type"
-                            context="{'group_by': 'cuisine_type'}"/>
-                    <filter name="group_state" string="Status"
-                            context="{'group_by': 'state'}"/>
-                    <filter name="group_stall" string="Stall"
-                            context="{'group_by': 'stall_id'}"/>
-                </group>
             </search>
         </field>
     </record>

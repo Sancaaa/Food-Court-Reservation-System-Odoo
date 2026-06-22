@@ -1,4 +1,4 @@
-﻿"""Food Court Order Management."""
+"""Food Court Order Management."""
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -245,3 +245,6 @@ class FoodcourtOrder(models.Model):
         """Cancel the order."""
         self.write({'state': 'cancelled'})
 
+    def action_reset_draft(self):
+        """Reset the order to draft."""
+        self.write({'state': 'draft'})

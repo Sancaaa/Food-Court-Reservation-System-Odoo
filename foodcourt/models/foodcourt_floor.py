@@ -106,27 +106,10 @@ class FoodcourtFloor(models.Model):
             'context': {
                 'default_floor_id': self.id,
             },
-        }    
-        
-    # ------------------------------------------------------------------
-    # Action methods
-    # ------------------------------------------------------------------
-
-    def action_view_stalls(self):
-        """Open stalls belonging to this floor."""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Stalls',
-            'res_model': 'foodcourt.stall',
-            'view_mode': 'list,form',
-            'domain': [('floor_id', '=', self.id)],
-            'context': {
-                'default_floor_id': self.id,
-            },
         }
 
     def action_view_tables(self):
+        """Open tables belonging to this floor."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
