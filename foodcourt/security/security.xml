@@ -10,12 +10,6 @@
             <field name="sequence">100</field>
         </record>
 
-        <record id="privilege_foodcourt" model="res.groups.privilege">
-            <field name="name">Food Court</field>
-            <field name="category_id" ref="module_category_foodcourt"/>
-            <field name="sequence">100</field>
-        </record>
-
         <!-- ============================================================ -->
         <!-- Security Groups                                              -->
         <!-- ============================================================ -->
@@ -23,28 +17,28 @@
         <!-- Receptionist: handles reservations, table assignments -->
         <record id="group_foodcourt_receptionist" model="res.groups">
             <field name="name">Receptionist</field>
-            <field name="privilege_id" ref="privilege_foodcourt"/>
+            <field name="category_id" ref="module_category_foodcourt"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
         <!-- Cashier: handles orders and payments -->
         <record id="group_foodcourt_cashier" model="res.groups">
             <field name="name">Cashier</field>
-            <field name="privilege_id" ref="privilege_foodcourt"/>
+            <field name="category_id" ref="module_category_foodcourt"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
         <!-- Tenant Manager: manages own stall menus -->
         <record id="group_foodcourt_tenant" model="res.groups">
             <field name="name">Tenant Manager</field>
-            <field name="privilege_id" ref="privilege_foodcourt"/>
+            <field name="category_id" ref="module_category_foodcourt"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
         <!-- Food Court Manager: supervises all operations -->
         <record id="group_foodcourt_manager" model="res.groups">
             <field name="name">Food Court Manager</field>
-            <field name="privilege_id" ref="privilege_foodcourt"/>
+            <field name="category_id" ref="module_category_foodcourt"/>
             <field name="implied_ids" eval="[
                 (4, ref('group_foodcourt_receptionist')),
                 (4, ref('group_foodcourt_cashier')),
@@ -54,7 +48,7 @@
         <!-- Administrator: full access to everything -->
         <record id="group_foodcourt_admin" model="res.groups">
             <field name="name">Administrator</field>
-            <field name="privilege_id" ref="privilege_foodcourt"/>
+            <field name="category_id" ref="module_category_foodcourt"/>
             <field name="implied_ids" eval="[(4, ref('group_foodcourt_manager'))]"/>
         </record>
 
@@ -154,7 +148,7 @@
         <record id="rule_foodcourt_order_tenant" model="ir.rule">
             <field name="name">Food Court Order: Own Tenant Only</field>
             <field name="model_id" ref="model_foodcourt_order"/>
-            <field name="domain_force">[('tenant_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="domain_force">[('line_ids.tenant_id.partner_id', '=', user.partner_id.id)]</field>
             <field name="groups" eval="[(4, ref('group_foodcourt_tenant'))]"/>
         </record>
 
@@ -162,7 +156,7 @@
         <record id="rule_foodcourt_order_line_tenant" model="ir.rule">
             <field name="name">Food Court Order Line: Own Tenant Only</field>
             <field name="model_id" ref="model_foodcourt_order_line"/>
-            <field name="domain_force">[('order_id.tenant_id.partner_id', '=', user.partner_id.id)]</field>
+            <field name="domain_force">[('tenant_id.partner_id', '=', user.partner_id.id)]</field>
             <field name="groups" eval="[(4, ref('group_foodcourt_tenant'))]"/>
         </record>
 
