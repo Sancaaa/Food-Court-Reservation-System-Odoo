@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -141,11 +141,11 @@
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter name="group_floor" string="Floor/Area"
-                            context="{'group_by': 'floor_id'}"/>
+                            domain="[]" context="{'group_by': 'floor_id'}"/>
                     <filter name="group_state" string="Status"
-                            context="{'group_by': 'state'}"/>
+                            domain="[]" context="{'group_by': 'state'}"/>
                     <filter name="group_tenant" string="Tenant"
-                            context="{'group_by': 'tenant_id'}"/>
+                            domain="[]" context="{'group_by': 'tenant_id'}"/>
                 </group>
             </search>
         </field>
