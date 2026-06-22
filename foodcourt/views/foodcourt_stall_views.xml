@@ -138,15 +138,6 @@
                         domain="[('active', '=', True)]"/>
                 <filter name="filter_archived" string="Archived"
                         domain="[('active', '=', False)]"/>
-                <separator/>
-                <group expand="0" string="Group By">
-                    <filter name="group_floor" string="Floor/Area"
-                            domain="[]" context="{'group_by': 'floor_id'}"/>
-                    <filter name="group_state" string="Status"
-                            domain="[]" context="{'group_by': 'state'}"/>
-                    <filter name="group_tenant" string="Tenant"
-                            domain="[]" context="{'group_by': 'tenant_id'}"/>
-                </group>
             </search>
         </field>
     </record>
