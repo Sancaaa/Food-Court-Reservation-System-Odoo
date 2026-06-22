@@ -120,11 +120,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -184,7 +180,7 @@
                         <div>
                             <field name="order_type"/>
                             <span t-if="record.table_id.value">
-                                — <field name="table_id"/>
+                                - <field name="table_id"/>
                             </span>
                         </div>
                         <div class="mt-1">

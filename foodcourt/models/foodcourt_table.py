@@ -62,17 +62,10 @@ class FoodcourtTable(models.Model):
         default=lambda self: self.env.company,
     )
 
-    # ------------------------------------------------------------------
-    # SQL constraints
-    # ------------------------------------------------------------------
-
-    _sql_constraints = [
-        (
-            'name_company_uniq',
-            'UNIQUE(name, company_id)',
-            'The table name must be unique per company.',
-        ),
-    ]
+    _name_company_uniq = models.Constraint(
+        'UNIQUE(name, company_id)',
+        'The table name must be unique per company.',
+    )
 
     # ------------------------------------------------------------------
     # Action methods

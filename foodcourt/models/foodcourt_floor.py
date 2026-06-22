@@ -43,16 +43,19 @@ class FoodcourtFloor(models.Model):
         string='Number of Stalls',
         compute='_compute_stall_count',
         store=True,
+        precompute=True,
     )
     table_count = fields.Integer(
         string='Number of Tables',
         compute='_compute_table_count',
         store=True,
+        precompute=True,
     )
     total_capacity = fields.Integer(
         string='Total Seating Capacity',
         compute='_compute_total_capacity',
         store=True,
+        precompute=True,
         help="Sum of seating capacities across all tables on this floor.",
     )
     active = fields.Boolean(

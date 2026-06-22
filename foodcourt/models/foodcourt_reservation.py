@@ -103,6 +103,10 @@ class FoodcourtReservation(models.Model):
     notes = fields.Text(
         string='Special Requests',
     )
+    active = fields.Boolean(
+        string='Active',
+        default=True,
+    )
     order_ids = fields.One2many(
         comodel_name='foodcourt.order',
         inverse_name='reservation_id',
@@ -112,6 +116,7 @@ class FoodcourtReservation(models.Model):
         string='Order Count',
         compute='_compute_order_count',
     )
+
     total_table_capacity = fields.Integer(
         string='Total Table Capacity',
         compute='_compute_total_capacity',
@@ -122,11 +127,13 @@ class FoodcourtReservation(models.Model):
         string='Start',
         compute='_compute_calendar_dates',
         store=True,
+        precompute=True,
     )
     date_stop = fields.Datetime(
         string='End',
         compute='_compute_calendar_dates',
         store=True,
+        precompute=True,
     )
     company_id = fields.Many2one(
         comodel_name='res.company',
@@ -135,22 +142,14 @@ class FoodcourtReservation(models.Model):
         default=lambda self: self.env.company,
     )
 
-    # ------------------------------------------------------------------
-    # SQL constraints
-    # ------------------------------------------------------------------
-
-    _sql_constraints = [
-        (
-            'guest_count_positive',
-            'CHECK(guest_count > 0)',
-            'The number of guests must be at least 1.',
-        ),
-        (
-            'time_end_after_start',
-            'CHECK(time_end > time_start)',
-            'The end time must be after the start time.',
-        ),
-    ]
+    _guest_count_positive = models.Constraint(
+        'CHECK(guest_count > 0)',
+        'The number of guests must be at least 1.',
+    )
+    _time_end_after_start = models.Constraint(
+        'CHECK(time_end > time_start)',
+        'The end time must be after the start time.',
+    )
 
     # ------------------------------------------------------------------
     # Python constraints
@@ -162,7 +161,7 @@ class FoodcourtReservation(models.Model):
         for record in self:
             # Only enforce the future-date check when creating a record.
             # We use _origin to detect whether the record already existed
-            # (an update) — if so we skip the check so historical records
+            # (an update), so we skip the check and historical records
             # can still be edited.
             if not record._origin and record.reservation_date:
                 if record.reservation_date < fields.Date.context_today(self):
@@ -301,7 +300,7 @@ class FoodcourtReservation(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Orders'),
             'res_model': 'foodcourt.order',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('reservation_id', '=', self.id)],
             'context': {'default_reservation_id': self.id},
         }

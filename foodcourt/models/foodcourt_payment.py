@@ -8,7 +8,7 @@ class FoodcourtPayment(models.Model):
 
     Supports multiple payment methods common in Indonesian food courts
     (cash, cards, e-wallet, bank transfer, QRIS).  Each payment goes
-    through a simple *draft → confirmed* flow; confirmed payments can
+    through a simple *draft -> confirmed* flow; confirmed payments can
     be refunded if needed.
     """
 
@@ -60,11 +60,11 @@ class FoodcourtPayment(models.Model):
         string='Customer',
         related='order_id.customer_id',
         store=True,
+        precompute=True,
     )
     amount = fields.Float(
         string='Amount',
         required=True,
-        digits=(12, 2),
     )
     payment_method = fields.Selection(
         selection=PAYMENT_METHODS,
@@ -107,17 +107,10 @@ class FoodcourtPayment(models.Model):
         default=lambda self: self.env.company.currency_id,
     )
 
-    # ------------------------------------------------------------------
-    # SQL constraints
-    # ------------------------------------------------------------------
-
-    _sql_constraints = [
-        (
-            'amount_positive',
-            'CHECK(amount > 0)',
-            'The payment amount must be greater than zero.',
-        ),
-    ]
+    _amount_positive = models.Constraint(
+        'CHECK(amount > 0)',
+        'The payment amount must be greater than zero.',
+    )
 
     # ------------------------------------------------------------------
     # CRUD overrides

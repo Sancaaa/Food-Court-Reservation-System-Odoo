@@ -52,13 +52,12 @@ class FoodcourtOrderLine(models.Model):
     unit_price = fields.Float(
         string='Unit Price',
         required=True,
-        digits=(12, 2),
     )
     subtotal = fields.Float(
         string='Subtotal',
         compute='_compute_subtotal',
         store=True,
-        digits=(12, 2),
+        precompute=True,
     )
     notes = fields.Text(
         string='Special Instructions',
@@ -81,6 +80,7 @@ class FoodcourtOrderLine(models.Model):
         string='Company',
         related='order_id.company_id',
         store=True,
+        precompute=True,
     )
     currency_id = fields.Many2one(
         comodel_name='res.currency',
@@ -88,22 +88,14 @@ class FoodcourtOrderLine(models.Model):
         related='order_id.currency_id',
     )
 
-    # ------------------------------------------------------------------
-    # SQL constraints
-    # ------------------------------------------------------------------
-
-    _sql_constraints = [
-        (
-            'quantity_positive',
-            'CHECK(quantity > 0)',
-            'The quantity must be at least 1.',
-        ),
-        (
-            'unit_price_positive',
-            'CHECK(unit_price >= 0)',
-            'The unit price must be zero or positive.',
-        ),
-    ]
+    _quantity_positive = models.Constraint(
+        'CHECK(quantity > 0)',
+        'The quantity must be at least 1.',
+    )
+    _unit_price_positive = models.Constraint(
+        'CHECK(unit_price >= 0)',
+        'The unit price must be zero or positive.',
+    )
 
     # ------------------------------------------------------------------
     # Compute methods
@@ -111,7 +103,7 @@ class FoodcourtOrderLine(models.Model):
 
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
-        """Calculate line subtotal as quantity × unit price."""
+        """Calculate line subtotal as quantity times unit price."""
         for line in self:
             line.subtotal = line.quantity * line.unit_price
 

@@ -105,7 +105,7 @@ class FoodcourtOrder(models.Model):
         string='Subtotal',
         compute='_compute_amounts',
         store=True,
-        digits=(12, 2),
+        precompute=True,
     )
     tax_pct = fields.Float(
         string='Tax (%)',
@@ -116,13 +116,13 @@ class FoodcourtOrder(models.Model):
         string='Tax Amount',
         compute='_compute_amounts',
         store=True,
-        digits=(12, 2),
+        precompute=True,
     )
     total_amount = fields.Float(
         string='Total Amount',
         compute='_compute_amounts',
         store=True,
-        digits=(12, 2),
+        precompute=True,
     )
 
     # -- Payment tracking --
@@ -135,19 +135,20 @@ class FoodcourtOrder(models.Model):
         string='Amount Paid',
         compute='_compute_payment',
         store=True,
-        digits=(12, 2),
+        precompute=True,
     )
     amount_due = fields.Float(
         string='Amount Due',
         compute='_compute_payment',
         store=True,
-        digits=(12, 2),
+        precompute=True,
     )
     payment_state = fields.Selection(
         selection=PAYMENT_STATES,
         string='Payment Status',
         compute='_compute_payment',
         store=True,
+        precompute=True,
     )
 
     notes = fields.Text(

@@ -1,5 +1,6 @@
-from odoo import models, fields, api
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.fields import Command
 
 
 class ReservationWizard(models.TransientModel):
@@ -66,7 +67,7 @@ class ReservationWizard(models.TransientModel):
             'time_start': self.time_start,
             'time_end': self.time_end,
             'guest_count': self.guest_count,
-            'table_ids': [(6, 0, self.table_ids.ids)],
+            'table_ids': [Command.set(self.table_ids.ids)],
             'notes': self.notes,
         })
         

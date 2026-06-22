@@ -6,7 +6,7 @@ from odoo import api, fields, models
 class FoodcourtMenuCategory(models.Model):
     """Hierarchical categorisation of menu items.
 
-    Supports nested categories through a parent–child relationship backed
+    Supports nested categories through a parent-child relationship backed
     by ``_parent_store`` for efficient tree queries.  Each category may
     carry a small image and exposes a computed count of the menu items
     it contains.
@@ -69,17 +69,10 @@ class FoodcourtMenuCategory(models.Model):
         help="Number of menu items in this category.",
     )
 
-    # ------------------------------------------------------------------
-    # SQL constraints
-    # ------------------------------------------------------------------
-
-    _sql_constraints = [
-        (
-            'name_unique',
-            'UNIQUE(name)',
-            'The category name must be unique.',
-        ),
-    ]
+    _name_unique = models.Constraint(
+        'UNIQUE(name)',
+        'The category name must be unique.',
+    )
 
     # ------------------------------------------------------------------
     # Compute methods

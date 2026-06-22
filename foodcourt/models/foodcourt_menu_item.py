@@ -48,7 +48,6 @@ class FoodcourtMenuItem(models.Model):
     price = fields.Float(
         string='Price',
         required=True,
-        digits=(12, 2),
         tracking=True,
         help="Selling price for a single unit of this item.",
     )
@@ -105,19 +104,11 @@ class FoodcourtMenuItem(models.Model):
         default=lambda self: self.env.company.currency_id,
     )
 
-    # ------------------------------------------------------------------
-    # SQL constraints
-    # ------------------------------------------------------------------
-
-    _sql_constraints = [
-        (
-            'price_positive',
-            'CHECK(price >= 0)',
-            'The price must be zero or positive.',
-        ),
-        (
-            'name_tenant_unique',
-            'UNIQUE(name, tenant_id)',
-            'The item name must be unique per tenant.',
-        ),
-    ]
+    _price_positive = models.Constraint(
+        'CHECK(price >= 0)',
+        'The price must be zero or positive.',
+    )
+    _name_tenant_unique = models.Constraint(
+        'UNIQUE(name, tenant_id)',
+        'The item name must be unique per tenant.',
+    )
