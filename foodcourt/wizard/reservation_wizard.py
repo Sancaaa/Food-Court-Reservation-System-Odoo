@@ -16,13 +16,13 @@ class ReservationWizard(models.TransientModel):
     time_start = fields.Float(string='Start Time', required=True, default=12.0)
     time_end = fields.Float(string='End Time', required=True, default=13.0)
     guest_count = fields.Integer(string='Number of Guests', required=True, default=2)
-    floor_id = fields.Many2one('foodcourt.floor', string='Floor/Area')
+    floor_id = fields.Many2one('restaurant.floor', string='Floor/Area')
     table_ids = fields.Many2many(
-        'foodcourt.table', string='Tables',
+        'restaurant.table', string='Tables',
         domain="[('state', '=', 'available')]")
     notes = fields.Text(string='Special Requests')
     available_table_ids = fields.Many2many(
-        'foodcourt.table', 'wizard_available_table_rel',
+        'restaurant.table', 'wizard_available_table_rel',
         string='Available Tables', compute='_compute_available_tables')
 
     @api.depends('reservation_date', 'time_start', 'time_end', 'floor_id')
@@ -31,7 +31,7 @@ class ReservationWizard(models.TransientModel):
             domain = [('state', '=', 'available'), ('active', '=', True)]
             if wizard.floor_id:
                 domain.append(('floor_id', '=', wizard.floor_id.id))
-            
+
             # Find tables not reserved at this time
             if wizard.reservation_date and wizard.time_start and wizard.time_end:
                 overlapping = self.env['foodcourt.reservation'].search([
@@ -43,8 +43,8 @@ class ReservationWizard(models.TransientModel):
                 reserved_table_ids = overlapping.mapped('table_ids').ids
                 if reserved_table_ids:
                     domain.append(('id', 'not in', reserved_table_ids))
-            
-            wizard.available_table_ids = self.env['foodcourt.table'].search(domain)
+
+            wizard.available_table_ids = self.env['restaurant.table'].search(domain)
 
     @api.onchange('customer_id')
     def _onchange_customer_id(self):
@@ -57,7 +57,7 @@ class ReservationWizard(models.TransientModel):
         self.ensure_one()
         if not self.table_ids:
             raise ValidationError('Please select at least one table.')
-        
+
         reservation = self.env['foodcourt.reservation'].create({
             'customer_name': self.customer_name,
             'customer_phone': self.customer_phone,
@@ -70,7 +70,7 @@ class ReservationWizard(models.TransientModel):
             'table_ids': [Command.set(self.table_ids.ids)],
             'notes': self.notes,
         })
-        
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'foodcourt.reservation',

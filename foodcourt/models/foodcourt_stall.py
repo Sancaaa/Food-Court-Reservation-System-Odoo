@@ -25,7 +25,7 @@ class FoodcourtStall(models.Model):
         string='Stall Code',
     )
     floor_id = fields.Many2one(
-        comodel_name='foodcourt.floor',
+        comodel_name='restaurant.floor',
         string='Floor/Area',
         required=True,
         ondelete='restrict',

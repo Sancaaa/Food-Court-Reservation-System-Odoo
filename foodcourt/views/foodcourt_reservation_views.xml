@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -33,12 +33,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_orders" type="object"
-                                class="oe_stat_button" icon="fa-shopping-cart"
-                                invisible="order_count == 0">
-                            <field name="order_count" widget="statinfo"
-                                   string="Orders"/>
-                        </button>
+
                         <button class="oe_stat_button" icon="fa-users" disabled="1">
                             <field name="total_table_capacity" widget="statinfo"
                                    string="Capacity"/>
@@ -68,26 +63,7 @@
                                colspan="2"/>
                     </group>
                     <notebook>
-                        <page string="Orders" name="orders">
-                            <field name="order_ids">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="order_date"/>
-                                    <field name="total_amount" widget="monetary"
-                                           options="{'currency_field': 'currency_id'}"/>
-                                    <field name="state" widget="badge"
-                                           decoration-success="state == 'done'"
-                                           decoration-info="state in ('confirmed', 'preparing', 'ready')"
-                                           decoration-warning="state == 'served'"
-                                           decoration-danger="state == 'cancelled'"/>
-                                </list>
-                            </field>
-                            <div invisible="state != 'checked_in'">
-                                <button name="action_create_order" string="Create Order"
-                                        type="object" class="btn-primary"
-                                        icon="fa-plus"/>
-                            </div>
-                        </page>
+
                         <page string="Notes" name="notes">
                             <field name="notes"
                                    placeholder="Any special requests or notes..."/>
@@ -120,7 +96,7 @@
                        decoration-info="state == 'confirmed'"
                        decoration-danger="state in ('cancelled', 'no_show')"
                        decoration-warning="state == 'draft'"/>
-                <field name="order_count" optional="show"/>
+
             </list>
         </field>
     </record>

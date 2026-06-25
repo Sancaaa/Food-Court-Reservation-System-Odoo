@@ -94,19 +94,14 @@ class FoodcourtTenant(models.Model):
         help="Percentage of revenue shared with the food court management.",
         tracking=True,
     )
-    menu_item_ids = fields.One2many(
-        comodel_name='foodcourt.menu.item',
+    product_ids = fields.One2many(
+        comodel_name='product.template',
         inverse_name='tenant_id',
-        string='Menu Items',
+        string='Products',
     )
-    order_line_ids = fields.One2many(
-        comodel_name='foodcourt.order.line',
-        inverse_name='tenant_id',
-        string='Order Lines',
-    )
-    menu_count = fields.Integer(
+    product_count = fields.Integer(
         string='Menu Items',
-        compute='_compute_menu_count',
+        compute='_compute_product_count',
     )
     order_count = fields.Integer(
         string='Orders',
@@ -166,26 +161,27 @@ class FoodcourtTenant(models.Model):
     # Compute methods
     # ------------------------------------------------------------------
 
-    @api.depends('menu_item_ids')
-    def _compute_menu_count(self):
-        """Count menu items belonging to this tenant."""
+    @api.depends('product_ids')
+    def _compute_product_count(self):
+        """Count products (menu items) belonging to this tenant."""
         for tenant in self:
-            tenant.menu_count = len(tenant.menu_item_ids)
+            tenant.product_count = len(tenant.product_ids)
 
-    @api.depends('order_line_ids')
     def _compute_order_count(self):
-        """Count order lines belonging to this tenant."""
+        """Count POS order lines belonging to this tenant."""
         for tenant in self:
-            tenant.order_count = len(tenant.order_line_ids)
+            tenant.order_count = self.env['pos.order.line'].search_count([
+                ('tenant_id', '=', tenant.id),
+            ])
 
-    @api.depends('order_line_ids.subtotal', 'order_line_ids.order_id.state')
     def _compute_total_revenue(self):
-        """Sum subtotals of order lines whose parent order state is 'done'."""
+        """Sum price_subtotal of POS order lines whose order state is paid/done/invoiced."""
         for tenant in self:
-            done_lines = tenant.order_line_ids.filtered(
-                lambda l: l.order_id.state == 'done'
-            )
-            tenant.total_revenue = sum(done_lines.mapped('subtotal'))
+            lines = self.env['pos.order.line'].search([
+                ('tenant_id', '=', tenant.id),
+                ('order_id.state', 'in', ['paid', 'done', 'invoiced']),
+            ])
+            tenant.total_revenue = sum(lines.mapped('price_subtotal'))
 
     # ------------------------------------------------------------------
     # CRUD overrides
@@ -222,37 +218,38 @@ class FoodcourtTenant(models.Model):
         self.write({'state': 'draft'})
 
     def action_view_menu_items(self):
-        """Open list of menu items for this tenant."""
+        """Open list of products for this tenant."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Menu Items',
-            'res_model': 'foodcourt.menu.item',
+            'name': 'Products',
+            'res_model': 'product.template',
             'view_mode': 'list,kanban,form',
             'domain': [('tenant_id', '=', self.id)],
             'context': {'default_tenant_id': self.id},
         }
 
     def action_view_orders(self):
-        """Open list of order lines for this tenant."""
+        """Open POS order lines for this tenant."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Order Lines',
-            'res_model': 'foodcourt.order.line',
+            'name': 'POS Order Lines',
+            'res_model': 'pos.order.line',
             'view_mode': 'list,form',
             'domain': [('tenant_id', '=', self.id)],
-            'context': {'default_tenant_id': self.id},
         }
 
     def action_view_revenue(self):
-        """Open list of done order lines for this tenant."""
+        """Open POS order lines for completed orders of this tenant."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Revenue Details',
-            'res_model': 'foodcourt.order.line',
+            'res_model': 'pos.order.line',
             'view_mode': 'list,form',
-            'domain': [('tenant_id', '=', self.id), ('order_id.state', '=', 'done')],
-            'context': {'default_tenant_id': self.id},
+            'domain': [
+                ('tenant_id', '=', self.id),
+                ('order_id.state', 'in', ['paid', 'done', 'invoiced']),
+            ],
         }

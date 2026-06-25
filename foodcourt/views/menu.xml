@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Root Menu -->
     <menuitem id="menu_foodcourt_root"
@@ -19,18 +19,6 @@
         parent="menu_foodcourt_operations"
         action="action_foodcourt_reservation"
         sequence="10"/>
-
-    <menuitem id="menu_foodcourt_order"
-        name="Orders"
-        parent="menu_foodcourt_operations"
-        action="action_foodcourt_order"
-        sequence="20"/>
-
-    <menuitem id="menu_foodcourt_payment"
-        name="Payments"
-        parent="menu_foodcourt_operations"
-        action="action_foodcourt_payment"
-        sequence="30"/>
 
     <!-- ==================== -->
     <!-- TENANT MANAGEMENT -->
@@ -53,38 +41,12 @@
         sequence="20"/>
 
     <!-- ==================== -->
-    <!-- MENU MANAGEMENT -->
-    <!-- ==================== -->
-    <menuitem id="menu_foodcourt_menu_mgmt"
-        name="Menu Management"
-        parent="menu_foodcourt_root"
-        sequence="30"/>
-
-    <menuitem id="menu_foodcourt_menu_item"
-        name="Menu Items"
-        parent="menu_foodcourt_menu_mgmt"
-        action="action_foodcourt_menu_item"
-        sequence="10"/>
-
-    <menuitem id="menu_foodcourt_menu_category"
-        name="Categories"
-        parent="menu_foodcourt_menu_mgmt"
-        action="action_foodcourt_menu_category"
-        sequence="20"/>
-
-    <!-- ==================== -->
     <!-- REPORTS -->
     <!-- ==================== -->
     <menuitem id="menu_foodcourt_reports"
         name="Reports"
         parent="menu_foodcourt_root"
         sequence="40"/>
-
-    <menuitem id="menu_foodcourt_order_analysis"
-        name="Order Analysis"
-        parent="menu_foodcourt_reports"
-        action="action_foodcourt_order_analysis"
-        sequence="10"/>
 
     <menuitem id="menu_foodcourt_reservation_analysis"
         name="Reservation Analysis"
@@ -99,17 +61,4 @@
         name="Configuration"
         parent="menu_foodcourt_root"
         sequence="90"/>
-
-    <menuitem id="menu_foodcourt_floor"
-        name="Floors / Areas"
-        parent="menu_foodcourt_config"
-        action="action_foodcourt_floor"
-        sequence="10"/>
-
-    <menuitem id="menu_foodcourt_table"
-        name="Tables"
-        parent="menu_foodcourt_config"
-        action="action_foodcourt_table"
-        sequence="20"/>
 </odoo>
-

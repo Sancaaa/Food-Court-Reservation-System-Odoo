@@ -1,6 +1,6 @@
-﻿"""Food Court Reservation Management."""
+"""Food Court Reservation Management."""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
@@ -63,7 +63,7 @@ class FoodcourtReservation(models.Model):
         string='Email',
     )
     table_ids = fields.Many2many(
-        comodel_name='foodcourt.table',
+        comodel_name='restaurant.table',
         relation='foodcourt_reservation_table_rel',
         column1='reservation_id',
         column2='table_id',
@@ -106,16 +106,6 @@ class FoodcourtReservation(models.Model):
         string='Active',
         default=True,
     )
-    order_ids = fields.One2many(
-        comodel_name='foodcourt.order',
-        inverse_name='reservation_id',
-        string='Orders',
-    )
-    order_count = fields.Integer(
-        string='Order Count',
-        compute='_compute_order_count',
-    )
-
     total_table_capacity = fields.Integer(
         string='Total Table Capacity',
         compute='_compute_total_capacity',
@@ -166,18 +156,12 @@ class FoodcourtReservation(models.Model):
     # Compute methods
     # ------------------------------------------------------------------
 
-    @api.depends('order_ids')
-    def _compute_order_count(self):
-        """Count the orders linked to this reservation."""
-        for reservation in self:
-            reservation.order_count = len(reservation.order_ids)
-
-    @api.depends('table_ids', 'table_ids.capacity')
+    @api.depends('table_ids', 'table_ids.seats')
     def _compute_total_capacity(self):
         """Sum seating capacity of the reserved tables."""
         for reservation in self:
             reservation.total_table_capacity = sum(
-                reservation.table_ids.mapped('capacity')
+                reservation.table_ids.mapped('seats')
             )
 
     @api.depends('reservation_date', 'time_start', 'time_end')
@@ -281,43 +265,3 @@ class FoodcourtReservation(models.Model):
             reservation.state = 'no_show'
             if reservation.table_ids:
                 reservation.table_ids.write({'state': 'available'})
-
-    # ------------------------------------------------------------------
-    # Smart-button / action helpers
-    # ------------------------------------------------------------------
-
-    def action_view_orders(self):
-        """Open the list of orders linked to this reservation."""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Orders'),
-            'res_model': 'foodcourt.order',
-            'view_mode': 'list,form',
-            'domain': [('reservation_id', '=', self.id)],
-            'context': {'default_reservation_id': self.id},
-        }
-
-    def action_create_order(self):
-        """Create a new order linked to this reservation and open its form.
-
-        Returns:
-            dict: A window action pointing to the newly created order form.
-        """
-        self.ensure_one()
-        order = self.env['foodcourt.order'].create({
-            'reservation_id': self.id,
-            'customer_id': self.customer_id.id if self.customer_id else False,
-            'customer_name': self.customer_name,
-            'table_id': self.table_ids[:1].id if self.table_ids else False,
-            'order_type': 'dine_in',
-        })
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Order'),
-            'res_model': 'foodcourt.order',
-            'res_id': order.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-

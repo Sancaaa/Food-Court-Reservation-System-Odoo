@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- ============================================================ -->
@@ -34,14 +34,8 @@
                         <button class="oe_stat_button" type="object"
                                 name="action_view_menu_items"
                                 icon="fa-cutlery">
-                            <field name="menu_count" widget="statinfo"
-                                   string="Menu Items"/>
-                        </button>
-                        <button class="oe_stat_button" type="object"
-                                name="action_view_orders"
-                                icon="fa-shopping-cart">
-                            <field name="order_count" widget="statinfo"
-                                   string="Orders"/>
+                            <field name="product_count" widget="statinfo"
+                                   string="Products"/>
                         </button>
                         <button class="oe_stat_button" type="object"
                                 name="action_view_revenue"
@@ -80,14 +74,12 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Menu Items" name="menu_items">
-                            <field name="menu_item_ids">
-                                <list editable="bottom">
+                        <page string="Products" name="products">
+                            <field name="product_ids">
+                                <list>
                                     <field name="name"/>
-                                    <field name="price" widget="monetary"
-                                           options="{'currency_field': 'currency_id'}"/>
-                                    <field name="is_available"/>
-                                    <field name="is_halal"/>
+                                    <field name="list_price" widget="monetary"/>
+                                    <field name="available_in_pos"/>
                                     </list>
                             </field>
                         </page>

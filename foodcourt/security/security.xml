@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
 
@@ -55,30 +55,6 @@
         <record id="rule_foodcourt_stall_tenant" model="ir.rule">
             <field name="name">Food Court Stall: Own Tenant Only</field>
             <field name="model_id" ref="model_foodcourt_stall"/>
-            <field name="domain_force">[('tenant_id.partner_id', '=', user.partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('group_foodcourt_tenant'))]"/>
-        </record>
-
-        <!-- Tenant managers can only see menu items for their own tenant -->
-        <record id="rule_foodcourt_menu_item_tenant" model="ir.rule">
-            <field name="name">Food Court Menu Item: Own Tenant Only</field>
-            <field name="model_id" ref="model_foodcourt_menu_item"/>
-            <field name="domain_force">[('tenant_id.partner_id', '=', user.partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('group_foodcourt_tenant'))]"/>
-        </record>
-
-        <!-- Tenant managers can only see orders for their own tenant -->
-        <record id="rule_foodcourt_order_tenant" model="ir.rule">
-            <field name="name">Food Court Order: Own Tenant Only</field>
-            <field name="model_id" ref="model_foodcourt_order"/>
-            <field name="domain_force">[('line_ids.tenant_id.partner_id', '=', user.partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('group_foodcourt_tenant'))]"/>
-        </record>
-
-        <!-- Tenant managers can only see order lines for their own tenant -->
-        <record id="rule_foodcourt_order_line_tenant" model="ir.rule">
-            <field name="name">Food Court Order Line: Own Tenant Only</field>
-            <field name="model_id" ref="model_foodcourt_order_line"/>
             <field name="domain_force">[('tenant_id.partner_id', '=', user.partner_id.id)]</field>
             <field name="groups" eval="[(4, ref('group_foodcourt_tenant'))]"/>
         </record>

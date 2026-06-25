@@ -42,7 +42,7 @@
                                 <tr>
                                     <th>Table</th>
                                     <th>Floor</th>
-                                    <th>Capacity</th>
+                                    <th>Seats</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -50,7 +50,7 @@
                                     <tr>
                                         <td><span t-field="table.name"/></td>
                                         <td><span t-field="table.floor_id"/></td>
-                                        <td><span t-field="table.capacity"/> seats</td>
+                                        <td><span t-field="table.seats"/> seats</td>
                                     </tr>
                                 </t>
                             </tbody>
