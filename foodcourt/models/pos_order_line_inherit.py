@@ -19,9 +19,24 @@ class PosOrderLine(models.Model):
         index=True,
         help="Tenant derived from the product's template.",
     )
+    stall_id = fields.Many2one(
+        comodel_name='foodcourt.stall',
+        string='Stall',
+        compute='_compute_stall_id',
+        store=True,
+        precompute=True,
+        index=True,
+        help="Stall derived from the product's template.",
+    )
 
     @api.depends('product_id', 'product_id.product_tmpl_id.tenant_id')
     def _compute_tenant_id(self):
         """Resolve the tenant from the product template."""
         for line in self:
             line.tenant_id = line.product_id.product_tmpl_id.tenant_id
+
+    @api.depends('product_id', 'product_id.product_tmpl_id.stall_id')
+    def _compute_stall_id(self):
+        """Resolve the stall from the product template."""
+        for line in self:
+            line.stall_id = line.product_id.product_tmpl_id.stall_id

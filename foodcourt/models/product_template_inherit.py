@@ -16,3 +16,10 @@ class ProductTemplate(models.Model):
         index=True,
         help="The food court tenant that offers this product.",
     )
+    stall_id = fields.Many2one(
+        comodel_name='foodcourt.stall',
+        string='Stall',
+        ondelete='set null',
+        index=True,
+        help="The physical stall where this product is prepared/sold.",
+    )

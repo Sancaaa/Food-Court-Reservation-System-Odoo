@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Inherit Product Template Form to add Tenant field -->
+    <!-- Inherit Product Template Form to add Tenant and Stall fields -->
     <record id="view_product_template_form_inherit_foodcourt" model="ir.ui.view">
         <field name="name">product.template.form.inherit.foodcourt</field>
         <field name="model">product.template</field>
@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='group_general']" position="inside">
                 <field name="tenant_id"/>
+                <field name="stall_id"/>
             </xpath>
         </field>
     </record>

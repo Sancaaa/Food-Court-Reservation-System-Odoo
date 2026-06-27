@@ -111,6 +111,16 @@ class FoodcourtReservation(models.Model):
         compute='_compute_total_capacity',
         help="Sum of seating capacities of all reserved tables.",
     )
+    reservation_line_ids = fields.One2many(
+        comodel_name='foodcourt.reservation.line',
+        inverse_name='reservation_id',
+        string='Food Orders',
+    )
+    amount_total = fields.Float(
+        string='Total Amount',
+        compute='_compute_amount_total',
+        store=True,
+    )
     # Calendar datetime fields (computed from reservation_date + time_start/end)
     date_start = fields.Datetime(
         string='Start',
@@ -162,6 +172,14 @@ class FoodcourtReservation(models.Model):
         for reservation in self:
             reservation.total_table_capacity = sum(
                 reservation.table_ids.mapped('seats')
+            )
+
+    @api.depends('reservation_line_ids.price_subtotal')
+    def _compute_amount_total(self):
+        """Calculate the total amount for food orders."""
+        for reservation in self:
+            reservation.amount_total = sum(
+                reservation.reservation_line_ids.mapped('price_subtotal')
             )
 
     @api.depends('reservation_date', 'time_start', 'time_end')
@@ -265,3 +283,102 @@ class FoodcourtReservation(models.Model):
             reservation.state = 'no_show'
             if reservation.table_ids:
                 reservation.table_ids.write({'state': 'available'})
+
+    def action_create_pos_order(self):
+        """Create a POS Order for the food orders."""
+        self.ensure_one()
+        if self.state not in ['confirmed', 'checked_in']:
+            raise UserError(_("Reservation must be confirmed or checked in to create a POS order."))
+        if not self.reservation_line_ids:
+            raise UserError(_("No food orders to create a POS order."))
+            
+        pos_session = self.env['pos.session'].search([
+            ('state', '=', 'opened'),
+        ], limit=1)
+        
+        if not pos_session:
+            raise UserError(_("No active POS Session found. Please open a POS session first."))
+            
+        order_vals = {
+            'session_id': pos_session.id,
+            'partner_id': self.customer_id.id if self.customer_id else False,
+            'lines': [],
+            'table_id': self.table_ids[0].id if self.table_ids else False,
+            'amount_total': self.amount_total,
+            'amount_paid': 0.0,
+            'amount_return': 0.0,
+            'amount_tax': 0.0,
+        }
+        
+        for line in self.reservation_line_ids:
+            order_vals['lines'].append((0, 0, {
+                'product_id': line.product_id.id,
+                'qty': line.quantity,
+                'price_unit': line.price_unit,
+                'price_subtotal': line.price_subtotal,
+                'price_subtotal_incl': line.price_subtotal,
+                'full_product_name': line.product_id.name,
+            }))
+            
+        pos_order = self.env['pos.order'].create(order_vals)
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'pos.order',
+            'res_id': pos_order.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+
+class FoodcourtReservationLine(models.Model):
+    """Food orders associated with a reservation."""
+
+    _name = 'foodcourt.reservation.line'
+    _description = 'Reservation Food Order Line'
+
+    reservation_id = fields.Many2one(
+        comodel_name='foodcourt.reservation',
+        string='Reservation',
+        required=True,
+        ondelete='cascade',
+    )
+    product_id = fields.Many2one(
+        comodel_name='product.product',
+        string='Product',
+        required=True,
+        domain="[('available_in_pos', '=', True)]",
+    )
+    quantity = fields.Float(
+        string='Quantity',
+        default=1.0,
+        required=True,
+    )
+    price_unit = fields.Float(
+        string='Unit Price',
+        related='product_id.list_price',
+        readonly=True,
+        store=True,
+    )
+    price_subtotal = fields.Float(
+        string='Subtotal',
+        compute='_compute_price_subtotal',
+        store=True,
+    )
+    tenant_id = fields.Many2one(
+        comodel_name='foodcourt.tenant',
+        related='product_id.product_tmpl_id.tenant_id',
+        string='Tenant',
+        store=True,
+    )
+    stall_id = fields.Many2one(
+        comodel_name='foodcourt.stall',
+        related='product_id.product_tmpl_id.stall_id',
+        string='Stall',
+        store=True,
+    )
+
+    @api.depends('quantity', 'price_unit')
+    def _compute_price_subtotal(self):
+        for line in self:
+            line.price_subtotal = line.quantity * line.price_unit
