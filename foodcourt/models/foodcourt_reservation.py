@@ -226,7 +226,7 @@ class FoodcourtReservation(models.Model):
             conflicting_tables = overlapping.mapped('table_ids') & self.table_ids
             raise UserError(
                 _("The following tables are already reserved during this "
-                  "time slot: %s", ', '.join(conflicting_tables.mapped('name')))
+                  "time slot: %s", ', '.join(conflicting_tables.mapped('display_name')))
             )
 
     # ------------------------------------------------------------------
