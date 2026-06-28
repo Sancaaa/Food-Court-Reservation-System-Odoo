@@ -121,6 +121,17 @@ class FoodcourtReservation(models.Model):
         compute='_compute_amount_total',
         store=True,
     )
+    is_paid_online = fields.Boolean(
+        string='Paid Online',
+        default=False,
+        tracking=True,
+        help="Indicates if the reservation food orders have been paid online via payment gateway.",
+    )
+    payment_reference = fields.Char(
+        string='Payment Reference',
+        tracking=True,
+        help="Transaction ID from the payment gateway.",
+    )
     # Calendar datetime fields (computed from reservation_date + time_start/end)
     date_start = fields.Datetime(
         string='Start',
@@ -259,10 +270,13 @@ class FoodcourtReservation(models.Model):
             reservation.table_ids.write({'state': 'reserved'})
 
     def action_check_in(self):
-        """Mark the guest as checked in and set tables to occupied."""
+        """Mark the guest as checked in, set tables to occupied, and create POS Order if needed."""
         for reservation in self:
             reservation.state = 'checked_in'
             reservation.table_ids.write({'state': 'occupied'})
+            
+            if reservation.reservation_line_ids:
+                reservation._create_pos_order_from_reservation()
 
     def action_complete(self):
         """Complete the reservation and free the tables."""
@@ -284,20 +298,16 @@ class FoodcourtReservation(models.Model):
             if reservation.table_ids:
                 reservation.table_ids.write({'state': 'available'})
 
-    def action_create_pos_order(self):
-        """Create a POS Order for the food orders."""
+    def _create_pos_order_from_reservation(self):
+        """Create a POS Order for the food orders and mark paid if is_paid_online."""
         self.ensure_one()
-        if self.state not in ['confirmed', 'checked_in']:
-            raise UserError(_("Reservation must be confirmed or checked in to create a POS order."))
-        if not self.reservation_line_ids:
-            raise UserError(_("No food orders to create a POS order."))
-            
+        
         pos_session = self.env['pos.session'].search([
             ('state', '=', 'opened'),
         ], limit=1)
         
         if not pos_session:
-            raise UserError(_("No active POS Session found. Please open a POS session first."))
+            raise UserError(_("No active POS Session found. Please open a POS session before checking in this reservation."))
             
         order_vals = {
             'session_id': pos_session.id,
@@ -322,13 +332,40 @@ class FoodcourtReservation(models.Model):
             
         pos_order = self.env['pos.order'].create(order_vals)
         
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'pos.order',
-            'res_id': pos_order.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
+        if self.is_paid_online:
+            payment_method = self.env['pos.payment.method'].search([
+                ('is_cash_count', '=', False)
+            ], limit=1)
+            
+            if payment_method:
+                self.env['pos.payment'].create({
+                    'pos_order_id': pos_order.id,
+                    'amount': pos_order.amount_total,
+                    'payment_method_id': payment_method.id,
+                    'payment_date': fields.Datetime.now(),
+                })
+                pos_order.action_pos_order_paid()
+
+    @api.model
+    def get_available_tables_api(self, reservation_date_str, time_start, time_end, floor_id=False):
+        """Helper function for Next.js to get available tables."""
+        res_date = fields.Date.from_string(reservation_date_str)
+        domain = [('state', '=', 'available'), ('active', '=', True)]
+        if floor_id:
+            domain.append(('floor_id', '=', int(floor_id)))
+
+        overlapping = self.search([
+            ('reservation_date', '=', res_date),
+            ('state', 'in', ['confirmed', 'checked_in']),
+            ('time_start', '<', time_end),
+            ('time_end', '>', time_start),
+        ])
+        reserved_table_ids = overlapping.mapped('table_ids').ids
+        if reserved_table_ids:
+            domain.append(('id', 'not in', reserved_table_ids))
+
+        tables = self.env['restaurant.table'].search_read(domain, ['id', 'name', 'floor_id', 'seats'])
+        return tables
 
 
 class FoodcourtReservationLine(models.Model):
