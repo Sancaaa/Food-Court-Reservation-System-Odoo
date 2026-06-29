@@ -268,6 +268,7 @@ class FoodcourtReservation(models.Model):
             reservation._check_table_availability()
             reservation.state = 'confirmed'
             reservation.table_ids.write({'state': 'reserved'})
+        return True
 
     def action_check_in(self):
         """Mark the guest as checked in, set tables to occupied, and create POS Order if needed."""
@@ -277,12 +278,14 @@ class FoodcourtReservation(models.Model):
             
             if reservation.reservation_line_ids:
                 reservation._create_pos_order_from_reservation()
+        return True
 
     def action_complete(self):
         """Complete the reservation and free the tables."""
         for reservation in self:
             reservation.state = 'completed'
             reservation.table_ids.write({'state': 'available'})
+        return True
 
     def action_cancel(self):
         """Cancel the reservation and free the tables."""
@@ -290,6 +293,7 @@ class FoodcourtReservation(models.Model):
             reservation.state = 'cancelled'
             if reservation.table_ids:
                 reservation.table_ids.write({'state': 'available'})
+        return True
 
     def action_no_show(self):
         """Mark the reservation as no-show and free the tables."""
@@ -297,6 +301,7 @@ class FoodcourtReservation(models.Model):
             reservation.state = 'no_show'
             if reservation.table_ids:
                 reservation.table_ids.write({'state': 'available'})
+        return True
 
     def _create_pos_order_from_reservation(self):
         """Create a POS Order for the food orders and mark paid if is_paid_online."""
