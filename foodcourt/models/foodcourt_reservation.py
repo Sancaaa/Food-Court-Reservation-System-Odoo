@@ -364,7 +364,10 @@ class FoodcourtReservation(models.Model):
         if reserved_table_ids:
             domain.append(('id', 'not in', reserved_table_ids))
 
-        tables = self.env['restaurant.table'].search_read(domain, ['id', 'name', 'floor_id', 'seats'])
+        tables = self.env['restaurant.table'].search_read(domain, [
+                        'id', 'name', 'floor_id', 'seats', 
+                        'position_h', 'position_v', 'width', 'height', 'shape', 'color'
+                    ])
         return tables
 
 
