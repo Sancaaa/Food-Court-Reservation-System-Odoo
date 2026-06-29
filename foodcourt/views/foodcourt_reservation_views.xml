@@ -110,6 +110,7 @@
                 <field name="time_start" widget="float_time"/>
                 <field name="time_end" widget="float_time"/>
                 <field name="guest_count"/>
+                <field name="table_ids" widget="many2many_tags"/>
                 <field name="state" widget="badge"
                        decoration-success="state in ('checked_in', 'completed')"
                        decoration-info="state == 'confirmed'"
