@@ -27,6 +27,7 @@ class FoodcourtReservation(models.Model):
 
     STATES = [
         ('draft', 'Draft'),
+        ('pending_payment', 'Pending Payment'),
         ('confirmed', 'Confirmed'),
         ('checked_in', 'Checked In'),
         ('completed', 'Completed'),
@@ -131,6 +132,12 @@ class FoodcourtReservation(models.Model):
         string='Payment Reference',
         tracking=True,
         help="Transaction ID from the payment gateway.",
+    )
+    reminder_sent = fields.Boolean(
+        string='Reminder Sent',
+        default=False,
+        copy=False,
+        help="Indicates if the 3-hour reminder email has been sent.",
     )
     # Calendar datetime fields (computed from reservation_date + time_start/end)
     date_start = fields.Datetime(
@@ -247,7 +254,7 @@ class FoodcourtReservation(models.Model):
             ('id', '!=', self.id),
             ('reservation_date', '=', self.reservation_date),
             ('table_ids', 'in', self.table_ids.ids),
-            ('state', 'in', ['confirmed', 'checked_in']),
+            ('state', 'in', ['pending_payment', 'confirmed', 'checked_in']),
             ('time_start', '<', self.time_end),
             ('time_end', '>', self.time_start),
         ])
@@ -268,6 +275,12 @@ class FoodcourtReservation(models.Model):
             reservation._check_table_availability()
             reservation.state = 'confirmed'
             reservation.table_ids.write({'state': 'reserved'})
+            
+            # Send Confirmation Email
+            if reservation.customer_email:
+                template = self.env.ref('foodcourt.email_template_reservation_confirmed', raise_if_not_found=False)
+                if template:
+                    template.send_mail(reservation.id, force_send=False)
         return True
 
     def action_check_in(self):
@@ -361,7 +374,7 @@ class FoodcourtReservation(models.Model):
 
         overlapping = self.search([
             ('reservation_date', '=', res_date),
-            ('state', 'in', ['confirmed', 'checked_in']),
+            ('state', 'in', ['pending_payment', 'confirmed', 'checked_in']),
             ('time_start', '<', time_end),
             ('time_end', '>', time_start),
         ])
@@ -374,6 +387,68 @@ class FoodcourtReservation(models.Model):
                         'position_h', 'position_v', 'width', 'height', 'shape', 'color'
                     ])
         return tables
+
+    @api.model
+    def _cron_cancel_pending_payments(self):
+        """Auto-cancel pending payments older than 15 minutes to prevent table locking."""
+        from datetime import timedelta
+        
+        now_utc = fields.Datetime.now()
+        grace_time = now_utc - timedelta(minutes=15)
+        
+        expired_pending = self.search([
+            ('state', '=', 'pending_payment'),
+            ('create_date', '<=', grace_time)
+        ])
+        
+        for res in expired_pending:
+            res.action_cancel()
+            res.message_post(body="Reservation automatically cancelled because the payment window (15 minutes) expired.")
+
+    @api.model
+    def _cron_cancel_expired_reservations(self):
+        """Auto-cancel reservations 15 minutes past their arrival time."""
+        from datetime import timedelta
+        
+        # We check records that are still confirmed but not checked in.
+        # date_start is stored in UTC by Odoo datetime fields.
+        # fields.Datetime.now() is also UTC.
+        now_utc = fields.Datetime.now()
+        grace_time = now_utc - timedelta(minutes=15)
+        
+        # Find reservations where date_start was more than 15 mins ago
+        expired_reservations = self.search([
+            ('state', '=', 'confirmed'),
+            ('date_start', '!=', False),
+            ('date_start', '<=', grace_time)
+        ])
+        
+        for res in expired_reservations:
+            res.action_no_show()
+            res.message_post(body="Reservation automatically marked as No-Show due to 15-minute grace period expiration.")
+
+    @api.model
+    def _cron_send_reminder_emails(self):
+        """Send reminder emails 3 hours before arrival."""
+        from datetime import timedelta
+        
+        now_utc = fields.Datetime.now()
+        target_time = now_utc + timedelta(hours=3)
+        
+        upcoming_reservations = self.search([
+            ('state', '=', 'confirmed'),
+            ('reminder_sent', '=', False),
+            ('date_start', '!=', False),
+            ('date_start', '>=', now_utc),
+            ('date_start', '<=', target_time)
+        ])
+        
+        template = self.env.ref('foodcourt.email_template_reservation_reminder', raise_if_not_found=False)
+        if template:
+            for res in upcoming_reservations:
+                if res.customer_email:
+                    template.send_mail(res.id, force_send=False)
+                res.reminder_sent = True
 
 
 class FoodcourtReservationLine(models.Model):

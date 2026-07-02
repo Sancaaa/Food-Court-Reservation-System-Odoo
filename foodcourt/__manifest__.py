@@ -20,6 +20,8 @@
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
         'data/foodcourt_data.xml',
+        'data/mail_template_data.xml',
+        'data/cron_data.xml',
         'views/foodcourt_stall_views.xml',
         'views/foodcourt_tenant_views.xml',
         'views/foodcourt_reservation_views.xml',
